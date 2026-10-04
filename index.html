@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AV Educate Games</title>
+<meta name="description" content="Free games for the AV community from AV Educate.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#242522;--panel:#2f302d;--edge:#121211;--cream:#ebe3cb;--cream-dim:#b5ae98;--accent:#e8892f}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--cream);font-family:'Barlow',system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:48px 16px}
+  header{text-align:center;margin-bottom:36px}
+  header img{width:120px;height:auto}
+  h1{font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:.08em;font-size:clamp(30px,5vw,46px);margin:14px 0 6px}
+  header p{color:var(--cream-dim);margin:0;font-size:17px}
+  .games{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;width:min(960px,100%)}
+  .card{background:var(--panel);border:3px solid var(--edge);box-shadow:4px 4px 0 #000;padding:22px;display:flex;flex-direction:column;gap:10px}
+  .card h2{font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:.06em;font-size:28px;margin:0}
+  .card p{margin:0;line-height:1.5;color:var(--cream-dim)}
+  .tag{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.1em;font-size:13px;color:var(--accent)}
+  .play{margin-top:8px;display:inline-flex;align-items:center;justify-content:center;height:52px;background:var(--accent);color:#1a1209;font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:.1em;font-size:20px;text-decoration:none;border:3px solid #1a1209;box-shadow:inset -2px -2px 0 #a85d1c, inset 2px 2px 0 #f6b06e}
+  .play:hover{background:#f29a45}
+  .soon{opacity:.55}
+  footer{margin-top:auto;padding-top:40px;color:var(--cream-dim);font-size:14px}
+  footer a{color:var(--cream)}
+</style>
+</head>
+<body>
+<header>
+  <img src="assets/ave-logo-white.png" alt="AV Educate">
+  <h1>AV EDUCATE GAMES</h1>
+  <p>Free games for the AV community.</p>
+</header>
+<main class="games">
+  <article class="card">
+    <span class="tag">TRUCK LOGISTICS · 101 LEVELS · FREE</span>
+    <h2>TRUCK PACKER</h2>
+    <p>Pack AV road cases into a box truck, then stack, strap, tip and unload them at the venue. Pass the final exam to earn an AV Educate certificate.</p>
+    <p>Best on a laptop or desktop with a keyboard and mouse.</p>
+    <a class="play" href="/truck-packer/">PLAY</a>
+  </article>
+  <article class="card soon">
+    <span class="tag">COMING SOON</span>
+    <h2>MORE GAMES</h2>
+    <p>More AV training games are on the way.</p>
+  </article>
+</main>
+<footer>© AV Educate Inc. · <a href="https://aveducate.com">aveducate.com</a></footer>
+</body>
+</html>
