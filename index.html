@@ -24,6 +24,24 @@
   .tag{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.1em;font-size:13px;color:var(--accent)}
   .play{margin-top:8px;display:inline-flex;align-items:center;justify-content:center;height:52px;background:var(--accent);color:#1a1209;font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:.1em;font-size:20px;text-decoration:none;border:3px solid #1a1209;box-shadow:inset -2px -2px 0 #a85d1c, inset 2px 2px 0 #f6b06e}
   .play:hover{background:#f29a45}
+  .actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:8px}
+  .actions .play{margin-top:0;font-size:18px;padding:0 6px;cursor:pointer}
+  .alt{background:var(--panel);color:var(--cream);border-color:#1a1209;box-shadow:inset -2px -2px 0 #121211, inset 2px 2px 0 #4a4b46}
+  .alt:hover{background:#3a3b37}
+  .files{font-size:14px}
+  dialog{background:var(--panel);color:var(--cream);border:3px solid var(--edge);box-shadow:6px 6px 0 #000;padding:24px;width:min(440px,calc(100vw - 32px))}
+  dialog::backdrop{background:rgba(0,0,0,.65)}
+  dialog h3{font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:.06em;font-size:26px;margin:0 0 6px}
+  dialog p{margin:0 0 14px;color:var(--cream-dim);line-height:1.45}
+  dialog label{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.08em;font-size:14px;margin:10px 0 4px}
+  dialog input,dialog select{width:100%;height:44px;background:#1f201d;color:var(--cream);border:2px solid #121211;padding:0 10px;font:500 16px 'Barlow',sans-serif}
+  dialog input:focus,dialog select:focus{outline:2px solid var(--accent);outline-offset:0}
+  .row{display:flex;gap:10px;margin-top:18px}
+  .row .play{flex:1;margin-top:0;cursor:pointer}
+  .msg{min-height:22px;margin-top:10px;font-size:15px;color:var(--cream-dim)}
+  .msg.err{color:#e8604a}
+  .msg a{color:var(--accent)}
+  .req{color:var(--accent)}
   .soon{opacity:.55}
   footer{margin-top:auto;padding-top:40px;color:var(--cream-dim);font-size:14px}
   footer a{color:var(--cream)}
@@ -41,7 +59,12 @@
     <h2 class="gt"><img src="assets/icon-boxes.svg" alt="">TRUCK PACKOLOGY</h2>
     <p>Learn to pack an AV show truck: build the base, stack high and tight, strap every tier, and unload in the venue's order. 100 campaign levels and a final exam for an AV Educate certificate, then the Endless Tour.</p>
     <p>Best on a laptop or desktop with a keyboard and mouse.</p>
-    <a class="play" href="/truck-packology/">PLAY</a>
+    <p class="files"><b>MANUAL:</b> the Truck Packology Mini Manual (PDF, 44 pages).<br><b>STORY:</b> our comic book, <i>The Last Truck Out</i> (PDF, free).</p>
+    <div class="actions">
+      <a class="play" href="/truck-packology/">PLAY</a>
+      <button class="play alt" type="button" id="manualBtn">MANUAL</button>
+      <a class="play alt" id="comicBtn" href="/downloads/truck-packology-comic-the-last-truck-out.pdf" download>STORY</a>
+    </div>
   </article>
   <article class="card soon">
     <span class="tag">COMING SOON</span>
@@ -49,6 +72,60 @@
     <p>More AV training games are on the way.</p>
   </article>
 </main>
+<dialog id="manualDlg" aria-labelledby="manualTitle">
+  <form id="manualForm" novalidate>
+    <h3 id="manualTitle">GET THE MINI MANUAL</h3>
+    <p>Tell us who you are and the download starts right away. We'll only use this to keep you posted about Truck Packology.</p>
+    <label for="dName">NAME <span class="req">*</span></label><input id="dName" name="name" autocomplete="name" maxlength="80" required>
+    <label for="dEmail">EMAIL <span class="req">*</span></label><input id="dEmail" name="email" type="email" autocomplete="email" maxlength="120" required>
+    <label for="dCompany">COMPANY</label><input id="dCompany" name="company" autocomplete="organization" maxlength="120">
+    <label for="dRole">I AM</label><select id="dRole" name="role"><option value="Crew">Crew</option><option value="Labor provider">A labor provider</option><option value="Other">Other</option></select>
+    <div class="msg" id="dMsg" role="status"></div>
+    <div class="row"><button class="play alt" type="button" id="dCancel">CANCEL</button><button class="play" type="submit" id="dGo">DOWNLOAD</button></div>
+  </form>
+</dialog>
+<script>
+(() => {
+  // downloads are logged in the Truck Packology Registry sheet (Downloads tab); the manual also emails info@aveducate.com
+  const CLOUD_URL = 'https://script.google.com/macros/s/AKfycbwE4PTuIesRmHrwGGwSVseZqAqfT2nUcIA04DUG0X-iTzl92waVBdMujCFlbYEfuTga3g/exec';
+  const MANUAL = '/downloads/truck-packology-mini-manual.pdf', KEY = 'aveGames.downloader';
+  const $ = id => document.getElementById(id), dlg = $('manualDlg'), msg = $('dMsg');
+  const device = () => matchMedia('(pointer:coarse)').matches ? 'phone/tablet' : 'desktop';
+  const remembered = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ return {}; } };
+  const post = async body => { // no cookies (a Google sign-in redirect drops the POST); one retry on a hiccup
+    const send = async () => { try { const r = await fetch(CLOUD_URL, {method:'POST', credentials:'omit', redirect:'follow', body:JSON.stringify(body)}); return JSON.parse(await r.text()); } catch(e){ return null; } };
+    let j = await send(); if (!j || j.service) j = await send(); return j && !j.service ? j : null;
+  };
+  const start = (href, name) => { const a = document.createElement('a'); a.href = href; a.download = name; document.body.appendChild(a); a.click(); a.remove(); };
+  $('manualBtn').onclick = () => {
+    const r = remembered(); for (const k of ['name', 'email', 'company']) if (r[k]) $('d' + k[0].toUpperCase() + k.slice(1)).value = r[k];
+    if (r.role) $('dRole').value = r.role;
+    msg.textContent = ''; msg.className = 'msg'; $('dGo').disabled = false; dlg.showModal();
+  };
+  $('dCancel').onclick = () => dlg.close();
+  $('manualForm').onsubmit = async e => {
+    e.preventDefault();
+    const d = {name:$('dName').value.trim(), email:$('dEmail').value.trim(), company:$('dCompany').value.trim(), role:$('dRole').value};
+    if (!d.name || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.email)){ msg.textContent = 'Add your name and a valid email.'; msg.className = 'msg err'; return; }
+    try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(x){}
+    $('dGo').disabled = true; msg.className = 'msg'; msg.textContent = 'Starting your download…';
+    const j = await post({action:'download', file:'manual', ...d, device:device(), referrer:document.referrer});
+    if (j && !j.ok && j.error && j.error !== 'unknown action'){ msg.textContent = j.error; msg.className = 'msg err'; $('dGo').disabled = false; return; }
+    start(MANUAL, 'Truck-Packology-Mini-Manual.pdf'); // a server hiccup never blocks the download
+    msg.textContent = `Thanks, ${d.name.split(' ')[0]}! Your download has started. `;
+    const again = document.createElement('a'); again.href = MANUAL; again.download = 'Truck-Packology-Mini-Manual.pdf'; again.textContent = 'Download again'; msg.appendChild(again);
+  };
+  const countComic = from => { // free: the download goes ahead, the count rides along
+    try { fetch(CLOUD_URL, {method:'POST', mode:'no-cors', keepalive:true, credentials:'omit', body:JSON.stringify({action:'download', file:'comic', ...remembered(), device:device(), referrer:from || document.referrer})}); } catch(e){}
+  };
+  $('comicBtn').addEventListener('click', () => countComic());
+  // games.aveducate.com/?story (the link on the Mini Manual's comic cover): count it and start the comic download
+  if (new URLSearchParams(location.search).has('story')){
+    countComic('mini manual link'); start($('comicBtn').getAttribute('href'), 'Truck-Packology-Comic-The-Last-Truck-Out.pdf');
+    history.replaceState(null, '', location.pathname);
+  }
+})();
+</script>
 <footer>© AV Educate Inc. · <a href="https://aveducate.com">aveducate.com</a></footer>
 </body>
 </html>
