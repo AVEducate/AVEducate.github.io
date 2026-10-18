@@ -28,6 +28,7 @@
   .actions .play{margin-top:0;font-size:18px;padding:0 6px;cursor:pointer}
   .alt{background:var(--panel);color:var(--cream);border-color:#1a1209;box-shadow:inset -2px -2px 0 #121211, inset 2px 2px 0 #4a4b46}
   .alt:hover{background:#3a3b37}
+  .actions .off,.actions .off:hover{opacity:.45;cursor:not-allowed;background:var(--panel)}   /* greyed out: on the way (Signal Flow manual) */
   .files{font-size:14px}
   dialog{background:var(--panel);color:var(--cream);border:3px solid var(--edge);box-shadow:6px 6px 0 #000;padding:24px;width:min(440px,calc(100vw - 32px))}
   dialog::backdrop{background:rgba(0,0,0,.65)}
@@ -73,6 +74,7 @@
     <p>60 levels in this beta. Plays on a phone or a computer. Testing it for us? Tap <b>Send feedback</b> after any level.</p>
     <div class="actions">
       <a class="play" href="/signal-flow/">PLAY</a>
+      <span class="play alt off" role="button" aria-disabled="true">MANUAL · COMING SOON</span>
     </div>
   </article>
   <article class="card soon">
